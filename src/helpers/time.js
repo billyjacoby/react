@@ -9,12 +9,12 @@ export function formatTime(time) {
   const [hours, minutes] = time.split(':');
 
   //check for times with special names
-  if (hours == '12' && minutes == '00') {
+  if (hours === '12' && minutes === '00') {
     return strings.noon;
   } else if (
-    (hours == '00' && minutes == '00') ||
-    (hours == '23' && minutes == '59') ||
-    (hours == '24' && minutes == '00')
+    (hours === '00' && minutes === '00') ||
+    (hours === '23' && minutes === '59') ||
+    (hours === '24' && minutes === '00')
   ) {
     return strings.midnight;
   }
@@ -34,10 +34,10 @@ export function parseTime(timeString) {
 
   const time = timeString.match(/(\d+)(:(\d\d))?\s*(p?)/i);
 
-  if (time == null) return null;
+  if (time === null) return null;
 
   let hours = parseInt(time[1], 10);
-  if (hours == 12 && !time[4]) {
+  if (hours === 12 && !time[4]) {
     hours = 0;
   } else {
     hours += hours < 12 && time[4] ? 12 : 0;

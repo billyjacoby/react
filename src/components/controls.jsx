@@ -39,7 +39,7 @@ export default class Controls extends Component {
 
   //keyword search
   keywordSearch(e) {
-    this.state.search = e.target.value;
+    this.setState({ ...this.state, search: e.target.value });
     if (this.props.state.input.mode === 'search') {
       this.props.state.input.search = e.target.value;
       this.props.setAppState('input', this.props.state.input);
@@ -82,7 +82,7 @@ export default class Controls extends Component {
   //open or close dropdown
   setDropdown(which) {
     this.setState({
-      dropdown: this.state.dropdown == which ? null : which,
+      dropdown: this.state.dropdown === which ? null : which,
     });
   }
 
@@ -95,7 +95,7 @@ export default class Controls extends Component {
     if (value) {
       if (e.metaKey) {
         const index = this.props.state.input[filter].indexOf(value);
-        if (index == -1) {
+        if (index === -1) {
           this.props.state.input[filter].push(value);
         } else {
           this.props.state.input[filter].splice(index, 1);
@@ -110,8 +110,8 @@ export default class Controls extends Component {
     //sort filters
     this.props.state.input[filter].sort((a, b) => {
       return (
-        this.props.state.indexes[filter].findIndex(x => a == x.key) -
-        this.props.state.indexes[filter].findIndex(x => b == x.key)
+        this.props.state.indexes[filter].findIndex(x => a === x.key) -
+        this.props.state.indexes[filter].findIndex(x => b === x.key)
       );
     });
 
@@ -122,13 +122,13 @@ export default class Controls extends Component {
   //set search mode dropdown
   setMode(e, mode) {
     e.preventDefault();
-    if (mode == 'me') {
+    if (mode === 'me') {
       //clear search value
       this.props.state.input.search = '';
     } else {
       //focus after waiting for disabled to clear
       setTimeout(
-        function () {
+        function() {
           this.searchInput.current.focus();
         }.bind(this),
         100
@@ -168,23 +168,24 @@ export default class Controls extends Component {
               />
               <div
                 className={cx('dropdown-menu dropdown-menu-right', {
-                  show: this.state.dropdown == 'search',
+                  show: this.state.dropdown === 'search',
                 })}
               >
                 {settings.modes.map(x => (
-                  <a
+                  <button
                     key={x}
                     className={cx(
                       'dropdown-item d-flex justify-content-between align-items-center',
                       {
-                        'active bg-secondary': this.props.state.input.mode == x,
+                        'active bg-secondary':
+                          this.props.state.input.mode === x,
                       }
                     )}
                     href="#"
                     onClick={e => this.setMode(e, x)}
                   >
                     {strings.modes[x]}
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>
@@ -218,7 +219,7 @@ export default class Controls extends Component {
             <button
               type="button"
               className={cx('btn btn-outline-secondary w-100', {
-                active: this.props.state.input.view == 'list',
+                active: this.props.state.input.view === 'list',
               })}
               onClick={e => this.setView(e, 'list')}
             >
@@ -227,7 +228,7 @@ export default class Controls extends Component {
             <button
               type="button"
               className={cx('btn btn-outline-secondary w-100', {
-                active: this.props.state.input.view == 'map',
+                active: this.props.state.input.view === 'map',
               })}
               onClick={e => this.setView(e, 'map')}
             >

@@ -17,7 +17,7 @@ export function filterMeetingData(state, setAppState) {
         [].concat.apply(
           [],
           state.input[filter].map(x => {
-            const value = state.indexes[filter].find(y => y.key == x);
+            const value = state.indexes[filter].find(y => y.key === x);
             return value ? value.slugs : [];
           })
         )
@@ -34,7 +34,7 @@ export function filterMeetingData(state, setAppState) {
       //todo: improve searching to be OR search instead of AND
       filterFound = true;
       let needle = processSearch(state.input.search.toLowerCase());
-      let matches = state.meetings.filter(function (meeting) {
+      let matches = state.meetings.filter(function(meeting) {
         return meeting.search.search(needle) !== -1;
       });
       filteredSlugs.push(
@@ -264,7 +264,10 @@ export function loadMeetingData(meetings, capabilities) {
 
       //flags
       meeting.flags = settings.flags
-        .filter(type => lookup_type_values.includes(type) && meeting.types.includes(type))
+        .filter(
+          type =>
+            lookup_type_values.includes(type) && meeting.types.includes(type)
+        )
         .sort()
         .join(', ');
 
@@ -330,6 +333,9 @@ export function loadMeetingData(meetings, capabilities) {
       if (!meeting_properties.includes(key)) {
         delete meeting[key];
       }
+      // added return statement here//
+
+      return null;
     });
 
     //define any missing values
@@ -370,8 +376,8 @@ export function loadMeetingData(meetings, capabilities) {
     //settings.modes.push('location');
     if (
       navigator.geolocation &&
-      (window.location.protocol == 'https:' ||
-        window.location.hostname == 'localhost')
+      (window.location.protocol === 'https:' ||
+        window.location.hostname === 'localhost')
     ) {
       capabilities.geolocation = true;
       settings.modes.push('me');
@@ -423,7 +429,7 @@ export function translateGoogleSheet(data) {
     let meeting = {};
     const meetingKeys = Object.keys(data.feed.entry[i]);
     for (let j = 0; j < meetingKeys.length; j++) {
-      if (meetingKeys[j].substr(0, 4) == 'gsx$') {
+      if (meetingKeys[j].substr(0, 4) === 'gsx$') {
         meeting[meetingKeys[j].substr(4)] =
           data.feed.entry[i][meetingKeys[j]]['$t'];
       }
@@ -456,7 +462,11 @@ function processSearch(search_string) {
   if (search_string.includes('"')) {
     var exp = /"(.*?)"/g;
     // Grab any quoted strings, add them to terms, and delete from source string
-    for (var match = exp.exec(search_string); match != null; match = exp.exec(search_string)) {
+    for (
+      var match = exp.exec(search_string);
+      match != null;
+      match = exp.exec(search_string)
+    ) {
       search_string = search_string.replace(match[0], '');
       terms.push(match[0].replace(/"/g, ''));
     }

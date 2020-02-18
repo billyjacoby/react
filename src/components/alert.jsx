@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import cx from 'classnames/bind';
+import React, { Component } from "react";
+import cx from "classnames/bind";
 
-import { strings } from '../helpers/settings';
+import { strings } from "../helpers/settings";
 
 export default class Alert extends Component {
   render() {
@@ -13,10 +13,10 @@ export default class Alert extends Component {
     }
     return (
       <div
-        className={cx('alert', {
-          'alert-danger': this.props.state.error,
-          'alert-warning': this.props.state.alert && !this.props.state.error,
-          'd-none': !message,
+        className={cx("alert", {
+          "alert-danger": this.props.state.error,
+          "alert-warning": this.props.state.alert && !this.props.state.error,
+          "d-none": !message
         })}
       >
         {message}

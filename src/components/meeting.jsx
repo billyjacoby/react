@@ -1,17 +1,17 @@
-import React, { Component } from 'react';
-import cx from 'classnames/bind';
-import ReactMapGL, { Marker, NavigationControl, Popup } from 'react-map-gl';
+import React, { Component } from "react";
+import cx from "classnames/bind";
+import ReactMapGL, { Marker, NavigationControl, Popup } from "react-map-gl";
 
-import { settings, strings } from '../helpers/settings';
-import Link from './link';
-import Name from './name';
+import { settings, strings } from "../helpers/settings";
+import Link from "./link";
+import Name from "./name";
 
 export default class Meeting extends Component {
   constructor() {
     super();
     this.state = {
       popup: true,
-      viewport: null,
+      viewport: null
     };
     this.updateViewport = this.updateViewport.bind(this);
   }
@@ -19,8 +19,8 @@ export default class Meeting extends Component {
   goBack(event) {
     event.preventDefault();
     this.props.state.input.meeting = null;
-    this.state.viewport = null;
-    this.props.setAppState('input', this.props.state.input);
+    this.setState({ ...this.state, viewport: null });
+    this.props.setAppState("input", this.props.state.input);
   }
 
   updateViewport(viewport) {
@@ -32,38 +32,43 @@ export default class Meeting extends Component {
 
     //fetch meeting data from array
     for (let i = 0; i < this.props.state.meetings.length; i++) {
-      if (this.props.state.meetings[i].slug == this.props.state.input.meeting) {
+      if (
+        this.props.state.meetings[i].slug === this.props.state.input.meeting
+      ) {
         meeting = this.props.state.meetings[i];
 
         meeting.latitude = parseFloat(meeting.latitude);
         meeting.longitude = parseFloat(meeting.longitude);
 
         if (!this.state.viewport) {
-          this.state.viewport = {
-            latitude: meeting.latitude,
-            longitude: meeting.longitude,
-            zoom: 14,
-          };
+          this.setState({
+            ...this.state,
+            viewport: {
+              latitude: meeting.latitude,
+              longitude: meeting.longitude,
+              zoom: 14
+            }
+          });
         }
 
         //create a link for directions
         const iOS =
           !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
-        let maps_prefix = '';
+        let maps_prefix = "";
 
         if (iOS) {
-          maps_prefix = 'maps://?';
+          maps_prefix = "maps://?";
         } else {
-          maps_prefix = 'https://www.google.com/maps?';
+          maps_prefix = "https://www.google.com/maps?";
         }
 
         meeting.direction_link =
           maps_prefix +
-          'daddr=' +
+          "daddr=" +
           meeting.latitude +
-          ',' +
+          "," +
           meeting.longitude +
-          '&saddr=Current+Location&q=' +
+          "&saddr=Current+Location&q=" +
           encodeURIComponent(meeting.formatted_address);
 
         //set page title
@@ -91,6 +96,7 @@ export default class Meeting extends Component {
               className="btn btn-outline-secondary btn-block mb-3"
               href={meeting.direction_link}
               target="_blank"
+              rel="noopener noreferrer"
             >
               {strings.get_directions}
             </a>
@@ -98,24 +104,24 @@ export default class Meeting extends Component {
               <div className="list-group-item border-bottom-0">
                 <h5>{strings.meeting_information}</h5>
                 <p className="my-0 mt-1">
-                  {strings[settings.days[meeting.day]]},{' '}
+                  {strings[settings.days[meeting.day]]},{" "}
                   {meeting.formatted_time}
-                  {meeting.end_time ? ' – ' + meeting.formatted_end_time : ''}
+                  {meeting.end_time ? " – " + meeting.formatted_end_time : ""}
                 </p>
                 <ul
-                  className={cx('my-0 mt-1', {
-                    'd-none': !meeting.types || !meeting.types.length,
+                  className={cx("my-0 mt-1", {
+                    "d-none": !meeting.types || !meeting.types.length
                   })}
                 >
                   {meeting.types
                     ? meeting.types.map(type => {
-                      return <li key={type}>{type}</li>;
-                    })
-                    : ''}
+                        return <li key={type}>{type}</li>;
+                      })
+                    : ""}
                 </ul>
                 {meeting.notes && (
                   <p className="my-0 mt-2">
-                    {meeting.notes.replace(/(?:\r\n|\r|\n)/g, '<br>')}
+                    {meeting.notes.replace(/(?:\r\n|\r|\n)/g, "<br>")}
                   </p>
                 )}
               </div>
@@ -124,12 +130,12 @@ export default class Meeting extends Component {
                 <p className="my-0 mt-1">{meeting.formatted_address}</p>
                 {this.props.state.meetings &&
                   meeting &&
-                  meeting.hasOwnProperty('formatted_address') && (
+                  meeting.hasOwnProperty("formatted_address") && (
                     <>
                       {settings.days.map((day, index) => {
                         const meetings = this.props.state.meetings.filter(
                           m =>
-                            m.day == index &&
+                            m.day === index &&
                             m.formatted_address === meeting.formatted_address
                         );
                         return (
@@ -140,23 +146,25 @@ export default class Meeting extends Component {
                               </h6>
                               <ol
                                 className="m-0 p-0"
-                                style={{ listStyleType: 'none' }}
+                                style={{ listStyleType: "none" }}
                               >
                                 {meetings.map(m => (
                                   <li
                                     key={m.slug}
-                                    style={{ paddingLeft: '5.25rem' }}
+                                    style={{ paddingLeft: "5.25rem" }}
                                   >
                                     <span
                                       className="position-absolute text-muted text-right"
                                       style={{
-                                        left: '1.25rem',
-                                        width: '4.5rem',
+                                        left: "1.25rem",
+                                        width: "4.5rem"
                                       }}
                                     >
                                       {m.formatted_time}
                                     </span>
-                                    {m.slug === meeting.slug && <Name meeting={m} />}
+                                    {m.slug === meeting.slug && (
+                                      <Name meeting={m} />
+                                    )}
                                     {m.slug !== meeting.slug && (
                                       <Link
                                         meeting={m}
@@ -177,8 +185,8 @@ export default class Meeting extends Component {
             </div>
           </div>
           <div
-            className={cx('col-md-8 map', {
-              'd-none': !this.props.state.capabilities.map,
+            className={cx("col-md-8 map", {
+              "d-none": !this.props.state.capabilities.map
             })}
           >
             {this.state.viewport && meeting.latitude && (

@@ -1,9 +1,9 @@
-import qs from 'query-string';
-import merge from 'deepmerge';
+import qs from "query-string";
+import merge from "deepmerge";
 
-import { settings } from './settings';
+import { settings } from "./settings";
 
-const separator = '/'; //used to separate multiple query string values (eg day=0/1)
+const separator = "/"; //used to separate multiple query string values (eg day=0/1)
 
 export function getQueryString(queryString) {
   let input = {
@@ -15,10 +15,10 @@ export function getQueryString(queryString) {
     query: null,
     radius: null,
     region: [],
-    search: '',
+    search: "",
     time: [],
     type: [],
-    view: settings.defaults.view,
+    view: settings.defaults.view
   };
 
   //today mode
@@ -27,11 +27,11 @@ export function getQueryString(queryString) {
   }
 
   //load input from query string
-  let querystring = qs.parse(location.search);
+  let querystring = qs.parse(window.location.search);
   for (let i = 0; i < settings.filters.length; i++) {
     let filter = settings.filters[i];
     if (querystring[filter]) {
-      if (filter === 'day' && querystring.day === 'any') {
+      if (filter === "day" && querystring.day === "any") {
         input.day = [];
       } else if (querystring[filter]) {
         input[filter] = querystring[filter].split(separator);
@@ -51,9 +51,8 @@ export function getQueryString(queryString) {
 }
 
 export function setQueryString(state) {
-
   let query = {};
-  const existingQuery = qs.parse(location.search);
+  const existingQuery = qs.parse(window.location.search);
 
   //filter by region, day, time, and type
   for (let i = 0; i < settings.filters.length; i++) {
@@ -61,7 +60,7 @@ export function setQueryString(state) {
     if (
       state.input[filter].length &&
       state.indexes[filter].length &&
-      filter !== 'day'
+      filter !== "day"
     ) {
       query[filter] = state.input[filter].join(separator);
     }
@@ -78,34 +77,34 @@ export function setQueryString(state) {
       existingQuery.time ||
       existingQuery.type ||
       state.input.day.length > 1 ||
-      state.input.day[0] != new Date().getDay()
+      state.input.day[0] !== new Date().getDay()
     ) {
       query.day = state.input.day.join(separator);
     }
   } else if (settings.defaults.today) {
-    query.day = 'any';
+    query.day = "any";
   }
 
   //keyword search
   if (state.input.search.length) {
-    query['search'] = state.input.search;
+    query["search"] = state.input.search;
   }
 
   //location search
   if (state.input.center) {
-    query['center'] = [
+    query["center"] = [
       state.input.center.latitude,
-      state.input.center.longitude,
-    ].join(',');
+      state.input.center.longitude
+    ].join(",");
   }
 
   //set mode property
-  if (state.input.mode != settings.defaults.mode) {
+  if (state.input.mode !== settings.defaults.mode) {
     query.mode = state.input.mode;
   }
 
   //set map property if set
-  if (state.input.view != settings.defaults.view) {
+  if (state.input.view !== settings.defaults.view) {
     query.view = state.input.view;
   }
 
@@ -124,7 +123,7 @@ export function setQueryString(state) {
         meeting: undefined,
         time: undefined,
         type: undefined,
-        view: undefined,
+        view: undefined
       }),
       query
     )
@@ -135,8 +134,8 @@ export function setQueryString(state) {
 
   //set the query string with html5
   window.history.pushState(
-    '',
-    '',
-    query.length ? '?' + query : window.location.pathname
+    "",
+    "",
+    query.length ? "?" + query : window.location.pathname
   );
 }

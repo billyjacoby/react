@@ -1,19 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
 
-import Alert from './components/alert';
-import Controls from './components/controls';
-import Loading from './components/loading';
-import Map from './components/map';
-import Meeting from './components/meeting';
-import Table from './components/table';
-import Title from './components/title';
-import { getQueryString, setQueryString } from './helpers/query-string';
-import { filterMeetingData, loadMeetingData, translateGoogleSheet } from './helpers/data';
-import { settings } from './helpers/settings';
+import Alert from "./components/alert";
+import Controls from "./components/controls";
+import Loading from "./components/loading";
+import Map from "./components/map";
+import Meeting from "./components/meeting";
+import Table from "./components/table";
+import Title from "./components/title";
+import { getQueryString, setQueryString } from "./helpers/query-string";
+import {
+  filterMeetingData,
+  loadMeetingData,
+  translateGoogleSheet
+} from "./helpers/data";
+import { settings } from "./helpers/settings";
 
-//locate first <meetings> element
-const [element] = document.getElementsByTagName('meetings');
+const [element] = document.getElementsByTagName("meetings");
 
 class App extends React.Component {
   constructor() {
@@ -29,19 +31,19 @@ class App extends React.Component {
         map: false,
         region: false,
         time: false,
-        type: false,
+        type: false
       },
       error: null,
-      input: getQueryString(location.search),
+      input: getQueryString(window.location.search),
       indexes: {
         day: [],
         region: [],
         time: [],
-        type: [],
+        type: []
       },
       loading: true,
       map_initialized: false,
-      meetings: [],
+      meetings: []
     };
 
     //need to bind this for the function to access `this`
@@ -50,11 +52,11 @@ class App extends React.Component {
 
   componentDidMount() {
     //if this is empty it'll be reported in fetch()s error handler
-    const json = element.getAttribute('src');
+    const json = element.getAttribute("src");
 
     //this is the default way to specify a mapbox key
-    if (element.getAttribute('mapbox')) {
-      settings.keys.mapbox = element.getAttribute('mapbox');
+    if (element.getAttribute("mapbox")) {
+      settings.keys.mapbox = element.getAttribute("mapbox");
     }
 
     //fetch json data file and build indexes
@@ -65,7 +67,7 @@ class App extends React.Component {
       .then(
         result => {
           //checks if src is google sheet and translates it if so
-          if (json.includes('spreadsheets.google.com')) {
+          if (json.includes("spreadsheets.google.com")) {
             result = translateGoogleSheet(result);
           }
 
@@ -78,14 +80,14 @@ class App extends React.Component {
             capabilities: capabilities,
             indexes: indexes,
             meetings: meetings,
-            loading: false,
+            loading: false
           });
         },
         error => {
-          console.error('JSON fetch error: ' + error);
+          console.error("JSON fetch error: " + error);
           this.setState({
-            error: json ? 'bad_data' : 'no_data',
-            loading: false,
+            error: json ? "bad_data" : "no_data",
+            loading: false
           });
         }
       );
@@ -98,7 +100,7 @@ class App extends React.Component {
 
   //function for map component to say it's ready without re-rendering
   setMapInitialized() {
-    this.state.map_initialized = true;
+    this.setState({ ...this.state, map_initialized: true });
   }
 
   render() {
@@ -112,7 +114,7 @@ class App extends React.Component {
     const filteredSlugs = filterMeetingData(this.state, this.setAppState);
 
     //show alert?
-    this.state.alert = filteredSlugs.length ? null : 'no_results';
+    this.state.alert = filteredSlugs.length ? null : "no_results";
 
     //make map update
     this.state.map_initialized = false;
@@ -122,34 +124,30 @@ class App extends React.Component {
         {this.state.input.meeting ? (
           <Meeting state={this.state} setAppState={this.setAppState} />
         ) : (
-            <>
-              {settings.title && <Title state={this.state} />}
-              <Controls state={this.state} setAppState={this.setAppState} />
-              <Alert state={this.state} />
-              {filteredSlugs.length > 0 && this.state.input.view === 'list' && (
-                <Table
-                  state={this.state}
-                  setAppState={this.setAppState}
-                  filteredSlugs={filteredSlugs}
-                />
-              )}
-              {filteredSlugs.length > 0 && this.state.input.view === 'map' && (
-                <Map
-                  state={this.state}
-                  setAppState={this.setAppState}
-                  setMapInitialized={this.setMapInitialized}
-                  filteredSlugs={filteredSlugs}
-                />
-              )}
-            </>
-          )}
+          <>
+            {settings.title && <Title state={this.state} />}
+            <Controls state={this.state} setAppState={this.setAppState} />
+            <Alert state={this.state} />
+            {filteredSlugs.length > 0 && this.state.input.view === "list" && (
+              <Table
+                state={this.state}
+                setAppState={this.setAppState}
+                filteredSlugs={filteredSlugs}
+              />
+            )}
+            {filteredSlugs.length > 0 && this.state.input.view === "map" && (
+              <Map
+                state={this.state}
+                setAppState={this.setAppState}
+                setMapInitialized={this.setMapInitialized}
+                filteredSlugs={filteredSlugs}
+              />
+            )}
+          </>
+        )}
       </div>
     );
   }
 }
 
-if (element) {
-  ReactDOM.render(<App />, element);
-} else {
-  console.warn('Could not find a <meetings> element in your HTML');
-}
+export default App;

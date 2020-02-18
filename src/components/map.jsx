@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import ReactMapGL, { Marker, NavigationControl, Popup } from 'react-map-gl';
-import WebMercatorViewport from 'viewport-mercator-project';
+import React, { Component } from "react";
+import ReactMapGL, { Marker, NavigationControl, Popup } from "react-map-gl";
+import WebMercatorViewport from "viewport-mercator-project";
 
-import { settings } from '../helpers/settings';
-import Link from './link';
+import { settings } from "../helpers/settings";
+import Link from "./link";
 
 export default class Map extends Component {
   constructor() {
@@ -13,7 +13,7 @@ export default class Map extends Component {
       locations: {},
       locations_keys: [],
       popup: true,
-      viewport: new WebMercatorViewport(),
+      viewport: new WebMercatorViewport()
     };
     //need this for changes to the viewport, eg panning, zooming, resizing
     this.updateViewport = this.updateViewport.bind(this);
@@ -28,37 +28,51 @@ export default class Map extends Component {
     //filter & sort meetings so southern pins are in front
     const meetings = this.props.state.meetings
       .filter(meeting => {
-        return this.props.filteredSlugs.indexOf(meeting.slug) != -1;
+        return this.props.filteredSlugs.indexOf(meeting.slug) !== -1;
       })
       .sort((a, b) => {
         return b.latitude - a.latitude;
       });
 
     //reset bounds
-    this.state.locations = {};
-    this.state.locations_keys = [];
-    this.state.bounds = {};
+    // all below were changes from to avoid directly mutating stater
+    this.setState({ ...this.state, locations: {} });
+    this.setState({ ...this.state, locations_keys: [] });
+    this.setState({ ...this.state, bounds: {} });
 
     //build index of map pins and define bounds
     for (let i = 0; i < meetings.length; i++) {
       let meeting = meetings[i];
 
       if (meeting.latitude && meeting.latitude) {
-        let coords = meeting.longitude + ',' + meeting.latitude;
+        let coords = meeting.longitude + "," + meeting.latitude;
         meeting.latitude = parseFloat(meeting.latitude);
         meeting.longitude = parseFloat(meeting.longitude);
 
         //create a new pin
         if (this.state.locations_keys.indexOf(coords) === -1) {
           this.state.locations_keys.push(coords);
-          this.state.locations[coords] = {
-            name: meeting.location,
-            formatted_address: meeting.formatted_address,
-            latitude: meeting.latitude,
-            longitude: meeting.longitude,
-            //probably a directions link here
-            meetings: [],
-          };
+          this.setState({
+            ...this.state,
+            locations: {
+              coords: {
+                name: meeting.location,
+                formatted_address: meeting.formatted_address,
+                latitude: meeting.latitude,
+                longitude: meeting.longitude,
+                //probably a directions link here
+                meetings: []
+              }
+            }
+          });
+          // this.state.locations[coords] = {
+          //   name: meeting.location,
+          //   formatted_address: meeting.formatted_address,
+          //   latitude: meeting.latitude,
+          //   longitude: meeting.longitude,
+          //   //probably a directions link here
+          //   meetings: [],
+          // };
         }
 
         //expand bounds
@@ -66,22 +80,22 @@ export default class Map extends Component {
           !this.state.bounds.north ||
           meeting.latitude > this.state.bounds.north
         )
-          this.state.bounds.north = meeting.latitude;
+          this.setState({ ...this.state, bounds: { north: meeting.latitude } });
         if (
           !this.state.bounds.south ||
           meeting.latitude < this.state.bounds.south
         )
-          this.state.bounds.south = meeting.latitude;
+          this.setState({ ...this.state, bounds: { south: meeting.latitude } });
         if (
           !this.state.bounds.east ||
           meeting.longitude > this.state.bounds.east
         )
-          this.state.bounds.east = meeting.longitude;
+          this.setState({ ...this.state, bounds: { east: meeting.longitude } });
         if (
           !this.state.bounds.west ||
           meeting.longitude < this.state.bounds.west
         )
-          this.state.bounds.west = meeting.longitude;
+          this.setState({ ...this.state, bounds: { west: meeting.longitude } });
 
         //add meeting to pin
         this.state.locations[coords].meetings.push(meeting);
@@ -91,11 +105,19 @@ export default class Map extends Component {
     //make the viewport
     if (this.state.bounds.west === this.state.bounds.east) {
       //single marker
-      this.state.viewport = {
-        latitude: this.state.bounds.north,
-        longitude: this.state.bounds.west,
-        zoom: 14,
-      };
+      this.setState({
+        ...this.state,
+        viewport: {
+          latitude: this.state.bounds.north,
+          longitude: this.state.bounds.west,
+          zoom: 14
+        }
+      });
+      // this.state.viewport = {
+      //   latitude: this.state.bounds.north,
+      //   longitude: this.state.bounds.west,
+      //   zoom: 14
+      // };
     } else {
       //calculate bounds now knowing dimensions
       //setTimeout seems to be unfortunately necessary to render properly (todo try removing)
@@ -103,16 +125,18 @@ export default class Map extends Component {
         this.setState({
           viewport: new WebMercatorViewport({
             width: this.state.viewport.width,
-            height: this.state.viewport.height,
+            height: this.state.viewport.height
           }).fitBounds(
             [
               [this.state.bounds.west, this.state.bounds.south],
-              [this.state.bounds.east, this.state.bounds.north],
+              [this.state.bounds.east, this.state.bounds.north]
             ],
             {
               padding:
-                Math.min(this.state.viewport.width, this.state.viewport.height) /
-                10,
+                Math.min(
+                  this.state.viewport.width,
+                  this.state.viewport.height
+                ) / 10
             }
           )
         });
@@ -135,7 +159,7 @@ export default class Map extends Component {
             mapboxApiAccessToken={settings.keys.mapbox}
             mapStyle={settings.mapbox_style}
             onViewportChange={this.updateViewport}
-            style={{ position: 'absolute' }}
+            style={{ position: "absolute" }}
             width="100%"
             height="100%"
           >
@@ -155,7 +179,7 @@ export default class Map extends Component {
                       onClick={() => this.setState({ popup: key })}
                     />
                   </Marker>
-                  {this.state.popup == key && (
+                  {this.state.popup === key && (
                     <Popup
                       latitude={location.latitude}
                       longitude={location.longitude}
