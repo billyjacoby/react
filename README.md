@@ -1,4 +1,4 @@
-**_ This is the refactor of this app intended to be able to be pulled from NPM _**
+_This is the refactor of this app intended to be able to be pulled from NPM_
 
 # Website Meeting Finder 2.0
 
@@ -27,6 +27,7 @@ You don't need to download anything. Simply add the following code to your page:
 
 1) In your `<body>` add:
    <meetings src="/path/to/meetings.json"/>
+
    <script src="https://react.meetingguide.org/app.js" async></script>
 
 1) Edit `/path/to/meetings.json` in the code above to point to your JSON file.
