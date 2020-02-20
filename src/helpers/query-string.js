@@ -1,9 +1,9 @@
-import qs from "query-string";
-import merge from "deepmerge";
+import qs from 'query-string';
+import merge from 'deepmerge';
 
-import { settings } from "./settings";
+import { settings } from './settings';
 
-const separator = "/"; //used to separate multiple query string values (eg day=0/1)
+const separator = '/'; //used to separate multiple query string values (eg day=0/1)
 
 export function getQueryString(queryString) {
   let input = {
@@ -15,15 +15,16 @@ export function getQueryString(queryString) {
     query: null,
     radius: null,
     region: [],
-    search: "",
+    search: '',
     time: [],
     type: [],
-    view: settings.defaults.view
+    view: settings.defaults.view,
   };
 
   //today mode
   if (settings.defaults.today) {
-    input.day.push(new Date().getDay());
+    // added the toString method in order to fix the functionality
+    input.day.push(new Date().getDay().toString());
   }
 
   //load input from query string
@@ -31,7 +32,7 @@ export function getQueryString(queryString) {
   for (let i = 0; i < settings.filters.length; i++) {
     let filter = settings.filters[i];
     if (querystring[filter]) {
-      if (filter === "day" && querystring.day === "any") {
+      if (filter === 'day' && querystring.day === 'any') {
         input.day = [];
       } else if (querystring[filter]) {
         input[filter] = querystring[filter].split(separator);
@@ -60,7 +61,7 @@ export function setQueryString(state) {
     if (
       state.input[filter].length &&
       state.indexes[filter].length &&
-      filter !== "day"
+      filter !== 'day'
     ) {
       query[filter] = state.input[filter].join(separator);
     }
@@ -82,20 +83,20 @@ export function setQueryString(state) {
       query.day = state.input.day.join(separator);
     }
   } else if (settings.defaults.today) {
-    query.day = "any";
+    query.day = 'any';
   }
 
   //keyword search
   if (state.input.search.length) {
-    query["search"] = state.input.search;
+    query['search'] = state.input.search;
   }
 
   //location search
   if (state.input.center) {
-    query["center"] = [
+    query['center'] = [
       state.input.center.latitude,
-      state.input.center.longitude
-    ].join(",");
+      state.input.center.longitude,
+    ].join(',');
   }
 
   //set mode property
@@ -123,7 +124,7 @@ export function setQueryString(state) {
         meeting: undefined,
         time: undefined,
         type: undefined,
-        view: undefined
+        view: undefined,
       }),
       query
     )
@@ -134,8 +135,8 @@ export function setQueryString(state) {
 
   //set the query string with html5
   window.history.pushState(
-    "",
-    "",
-    query.length ? "?" + query : window.location.pathname
+    '',
+    '',
+    query.length ? '?' + query : window.location.pathname
   );
 }
